@@ -15,6 +15,15 @@ for d in tmp_dirs
   end
 end
 
+bash "set_warehouse_storage_type" do
+  user node['hops']['hdfs']['user']
+  group node['hops']['group']
+  code <<-EOH
+    #{node['hops']['bin_dir']}/hdfs storagepolicies -setStoragePolicy -path #{node['hive2']['hopsfs_dir']}/warehouse -policy DB
+  EOH
+  action :run
+end
+
 # Create hive user-dir on hdfs
 hops_hdfs_directory "/user/#{node['hive2']['user']}" do
   action :create_as_superuser
@@ -33,11 +42,30 @@ hops_hdfs_directory node['hive2']['scratch_dir'] do
     not_if ". #{node['hops']['home']}/sbin/set-env.sh && #{node['hops']['home']}/bin/hdfs dfs -test -d #{node['hive2']['scratch_dir']}"
 end
 
+#Add the wiper
+template "#{node['hive2']['base_dir']}/bin/wiper.sh" do
+  source "wiper.sh.erb"
+  owner node['hive2']['user']
+  group node['hive2']['group']
+  action :create
+  mode 0700
+end
 
+# Template HiveServer2 for the JMX prometheus exporter
+cookbook_file "#{node['hive2']['conf_dir']}/hivemetastore.yaml" do
+  source 'hivemetastore.yaml'
+  owner node['hive2']['user']  
+  group node['hive2']['group'] 
+  mode '0755'
+  action :create
+end
 
+deps = ""
+if exists_local("ndb", "mysqld")
+  deps = "mysqld.service"
+end
 
 service_name="hivemetastore"
-
 case node['platform_family']
 when "rhel"
   systemd_script = "/usr/lib/systemd/system/#{service_name}.service"
@@ -56,6 +84,9 @@ template systemd_script do
   owner "root"
   group "root"
   mode 0754
+  variables({
+            :deps => deps
+           })
   if node['services']['enabled'] == "true"
     notifies :enable, resources(:service => service_name)
   end

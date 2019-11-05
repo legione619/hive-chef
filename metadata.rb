@@ -4,7 +4,7 @@ maintainer_email "jdowling@kth.se"
 license          "Apache v2"
 description      'Installs/Configures Hive Server'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "0.10.0"
+version          "1.0.0"
 source_url       "https://github.com/hopshadoop/hive-chef"
 
 
@@ -29,6 +29,10 @@ attribute "hive2/user",
           :description => "User to install/run as",
           :type => 'string'
 
+attribute "hive2/group",
+          :description => "User to install/run as",
+          :type => 'string'
+
 attribute "hive2/dir",
           :description => "base dir for installation",
           :type => 'string'
@@ -49,20 +53,12 @@ attribute "hive2/home",
           :dscription => "hive.home",
           :type => "string"
 
-attribute "hive2/keystore",
-          :dscription => "ivy.keystore",
-          :type => "string"
-
 attribute "hive2/mysql_user",
           :dscription => "mysql user account for hive",
           :type => "string"
 
 attribute "hive2/mysql_password",
           :dscription => "mysql user account for hive",
-          :type => "string"
-
-attribute "hive2/keystore_password",
-          :dscription => "ivy.keystore_password",
           :type => "string"
 
 attribute "hive2/metastore/private_ips",
@@ -81,6 +77,10 @@ attribute "hive2/metastore/port",
           :description => "metastore port",
           :type => "string"
 
+attribute "hive2/scratch_dir",
+          :description => "Hive Tez Scratch dir location",
+          :type => "string"
+
 attribute "hive2/conf/mapreduce_input_size",
           :description => "Configure the property: mapreduce.input.fileinputformat.split.minsize - doesn't like units",
           :type => "string"
@@ -91,4 +91,20 @@ attribute "install/dir",
 
 attribute "install/user",
           :description => "User to install the services as",
+          :type => "string"
+
+attribute "tez/user",
+          :description => "User to install/run tez as",
+          :type => 'string'
+
+attribute "slider/user",
+          :description => "User to install/run slider as",
+          :type => 'string'
+
+attribute "hive2/hudi_hadoop_mr_bundle_url",
+          :description => "URL for downloading hudi bundle jar to put in /lib of Hive installation",
+          :type => 'string'
+
+attribute "hive2/hudi_version",
+          :description => "the hudi version",
           :type => "string"
