@@ -1,5 +1,21 @@
 include_recipe "hive2::_configure"
 
+# Template HiveServer2 for the JMX prometheus exporter
+cookbook_file "#{node['hive2']['conf_dir']}/hiveserver2.yaml" do
+  source 'hiveserver2.yaml'
+  owner node['hive2']['user']  
+  group node['hive2']['group'] 
+  mode '0755'
+  action :create
+end
+
+deps = ""
+if exists_local("ndb", "mysqld") 
+  deps = "mysqld.service "
+end  
+if exists_local("hive2", "metastore") || exists_local("hive2", "default")
+  deps += "hivemetastore.service"
+end
 service_name="hiveserver2"
 
 case node['platform_family']
@@ -20,6 +36,9 @@ template systemd_script do
   owner "root"
   group "root"
   mode 0754
+  variables({
+            :deps => deps
+           })
   if node['services']['enabled'] == "true"
     notifies :enable, resources(:service => service_name)
   end

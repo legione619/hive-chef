@@ -2,6 +2,7 @@
 group node['tez']['group'] do
   action :create
   not_if "getent group #{node['tez']['group']}"
+  not_if { node['install']['external_users'].casecmp("true") == 0 }
 end
 
 user node['tez']['user'] do
@@ -10,12 +11,14 @@ user node['tez']['user'] do
   shell "/bin/bash"
   manage_home true
   not_if "getent passwd #{node['tez']['user']}"
+  not_if { node['install']['external_users'].casecmp("true") == 0 }
 end
 
 group node['tez']['group'] do
   action :modify
   members ["#{node['tez']['user']}"]
   append true
+  not_if { node['install']['external_users'].casecmp("true") == 0 }
 end
 
 package_url = "#{node['tez']['url']}"
@@ -68,6 +71,11 @@ hops_hdfs_directory cached_package_filename do
 end
 
 # Create configuration file
+directory node['tez']['conf_dir'] do
+  owner node['tez']['user']
+  group node['tez']['group']
+end
+
 template "#{node['tez']['conf_dir']}/tez-site.xml" do
   source "tez-site.xml.erb"
   owner node['tez']['user']
