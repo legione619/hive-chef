@@ -4,18 +4,22 @@ maintainer_email "jdowling@kth.se"
 license          "Apache v2"
 description      'Installs/Configures Hive Server'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "1.2.0"
+version          "1.3.0"
 source_url       "https://github.com/hopshadoop/hive-chef"
 
 
-
-depends          "ndb"
-depends          "hops"
-depends          "kagent"
-depends          "conda"
-depends          "java"
-depends          "kzookeeper"
-depends          "magic_shell"
+depends 'java', '~> 7.0.0'
+depends 'magic_shell', '~> 1.0.0'
+depends 'compat_resource', '~> 12.19.0'
+depends 'authbind', '~> 0.1.10'
+depends 'ntp', '~> 2.0.0'
+depends 'kagent'
+depends 'hops'
+depends 'ndb'
+depends 'conda'
+depends 'kzookeeper'
+depends 'consul'
+depends 'ulimit'
 
 recipe           "install", "Installs a Hive2 Server"
 recipe           "default", "Starts both a Hive metastore and server2 and tez"
@@ -75,6 +79,10 @@ attribute "hive2/server2/private_ips",
 
 attribute "hive2/metastore/port",
           :description => "metastore port",
+          :type => "string"
+
+attribute "hive2/metastore/enforce_authority",
+          :description => "Enforce warehouse authority to be the same as the one specified in the metastore.warehouse.dir option (default true)",
           :type => "string"
 
 attribute "hive2/scratch_dir",

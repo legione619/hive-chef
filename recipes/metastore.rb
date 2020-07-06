@@ -22,6 +22,7 @@ bash "set_warehouse_storage_type" do
     #{node['hops']['bin_dir']}/hdfs storagepolicies -setStoragePolicy -path #{node['hive2']['hopsfs_dir']}/warehouse -policy DB
   EOH
   action :run
+  not_if { node['hops']['enable_cloud_storage'].casecmp?("true") } 
 end
 
 # Create hive user-dir on hdfs
@@ -79,13 +80,16 @@ service service_name do
   action :nothing
 end
 
+rpc_namenode_fqdn = consul_helper.get_service_fqdn("rpc.namenode")
+
 template systemd_script do
   source "#{service_name}.service.erb"
   owner "root"
   group "root"
   mode 0754
   variables({
-            :deps => deps
+              :deps => deps,
+              :nn_rpc_endpoint => rpc_namenode_fqdn
            })
   if node['services']['enabled'] == "true"
     notifies :enable, resources(:service => service_name)
@@ -108,4 +112,20 @@ if conda_helpers.is_upgrade
   kagent_config "#{service_name}" do
     action :systemd_reload
   end
+end
+
+# Register Hive metastore with Consul
+template "#{node['hive2']['consul']}/metastore-health.sh" do
+  source "consul/hive-service-health.sh.erb"
+  owner node['hive2']['user']
+  group node['hops']['group']
+  variables({
+    :port => node['hive2']['hm']['metrics_port']
+  })
+  mode 0750
+end
+
+consul_service "Registering Hive metastore with Consul" do
+  service_definition "consul/metastore-consul.hcl.erb"
+  action :register
 end

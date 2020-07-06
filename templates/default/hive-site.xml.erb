@@ -372,8 +372,18 @@
     <description>location of default database for the warehouse</description>
   </property>
   <property>
+    <name>metastore.warehouse.enforce.authority</name>
+    <value><%= node['hive2']['metastore']['enforce_authority'] %></value>
+    <description>Enforce warehouse authority to be the same as the one specified in the metastore.warehouse.dir option</description>
+  </property>
+  <property>
+    <name>hive.warehouse.subdir.inherit.perms</name>
+    <value>true</value>
+    <description>Set this to false if the table directories should be created with the permissions derived from dfs umask instead of inheriting the permission of the warehouse or database directory.</description>
+  </property>
+  <property>
     <name>hive.metastore.uris</name>
-    <value>thrift://<%= @metastore_ip %>:<%= node['hive2']['metastore']['port'] %></value>
+    <value>thrift://<%= @metastore_fqdn %>:<%= node['hive2']['metastore']['port'] %></value>
     <description>Thrift URI for the remote metastore. Used by metastore client to connect to remote metastore.</description>
   </property>
   <property>
@@ -2579,7 +2589,7 @@
   </property>
   <property>
     <name>hive.zookeeper.quorum</name>
-    <value><%= @zk_endpoints %></value>
+    <value><%= @zk_fqdn %></value>
     <description>
       List of ZooKeeper servers to talk to. This is needed for:
       1. Read/write locks - when hive.lock.manager is set to
