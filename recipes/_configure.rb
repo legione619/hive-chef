@@ -1,9 +1,18 @@
-mysql_endpoint = private_recipe_ip("ndb", "mysqld") + ":#{node['ndb']['mysql_port']}"
+mysql_endpoint = "127.0.0.1:#{node['ndb']['mysql_port']}"
+
+# Add user hive to hadoop secure group as it needs access to ssl-server.xml
+# to read keymanagers reload interval
+group node['hops']['secure_group'] do
+  action :modify
+  members node['hive2']['user']
+  append true
+  not_if { node['install']['external_users'].casecmp("true") == 0 }
+end
 
 # Logging
 directory "#{node['hive2']['logs_dir']}" do
   owner node['hive2']['user']
-  group node['hive2']['group']
+  group node['hops']['group']
   mode "0775"
   action :create
 end
@@ -11,7 +20,7 @@ end
 template "#{node['hive2']['conf_dir']}/hive-log4j2.properties" do
   source "hive-log4j2.properties.erb"
   owner node['hive2']['user']
-  group node['hive2']['group']
+  group node['hops']['group']
   mode "0655"
 end
 
@@ -96,7 +105,7 @@ end
 template "#{node['hive2']['conf_dir']}/hive-env.sh" do
   source "hive-env.sh.erb"
   owner node['hive2']['user']
-  group node['hive2']['group']
+  group node['hops']['group']
   mode 0655
   action :create
 end

@@ -1,5 +1,15 @@
 include_recipe "hive2::_configure"
 
+unless exists_local("hive2", "server2")
+  crypto_dir = x509_helper.get_crypto_dir(node['hive2']['user'])
+  kagent_hopsify "Generate x.509" do
+    user node['hive2']['user']
+    crypto_directory crypto_dir
+    action :generate_x509
+    not_if { node["kagent"]["enabled"] == "false" }
+  end
+end
+
 private_ip = my_private_ip()
 public_ip = my_public_ip()
 
@@ -9,7 +19,7 @@ for d in tmp_dirs
   hops_hdfs_directory d do
     action :create_as_superuser
     owner node['hive2']['user']
-    group node['hive2']['group']
+    group node['hops']['group']
     mode "1755" #warehouse must be readable&executable for SparkSQL to read from Hive
     not_if ". #{node['hops']['home']}/sbin/set-env.sh && #{node['hops']['home']}/bin/hdfs dfs -test -d #{d}"
   end
@@ -29,7 +39,7 @@ end
 hops_hdfs_directory "/user/#{node['hive2']['user']}" do
   action :create_as_superuser
   owner node['hive2']['user']
-  group node['hive2']['group']
+  group node['hops']['group']
   mode "1751"
   not_if ". #{node['hops']['home']}/sbin/set-env.sh && #{node['hops']['home']}/bin/hdfs dfs -test -d #{"/user/#{node['hive2']['user']}"}"
 end
@@ -38,7 +48,7 @@ end
 hops_hdfs_directory node['hive2']['scratch_dir'] do
     action :create_as_superuser
     owner node['hive2']['user']
-    group node['hive2']['group']
+    group node['hops']['group']
     mode "1777" #scratchdir must be read/write/executable by everyone for SparkSQL user-jobs to write there
     not_if ". #{node['hops']['home']}/sbin/set-env.sh && #{node['hops']['home']}/bin/hdfs dfs -test -d #{node['hive2']['scratch_dir']}"
 end
@@ -47,7 +57,7 @@ end
 template "#{node['hive2']['base_dir']}/bin/wiper.sh" do
   source "wiper.sh.erb"
   owner node['hive2']['user']
-  group node['hive2']['group']
+  group node['hops']['group']
   action :create
   mode 0700
 end
@@ -56,14 +66,20 @@ end
 cookbook_file "#{node['hive2']['conf_dir']}/hivemetastore.yaml" do
   source 'hivemetastore.yaml'
   owner node['hive2']['user']  
-  group node['hive2']['group'] 
+  group node['hops']['group'] 
   mode '0755'
   action :create
 end
 
 deps = ""
 if exists_local("ndb", "mysqld")
-  deps = "mysqld.service"
+  deps = "mysqld.service "
+end
+
+deps += "consul.service "
+
+if exists_local("hops", "nn")
+  deps += "namenode.service "
 end
 
 service_name="hivemetastore"

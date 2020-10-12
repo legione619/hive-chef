@@ -4,7 +4,7 @@ maintainer_email "jdowling@kth.se"
 license          "Apache v2"
 description      'Installs/Configures Hive Server'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "1.3.0"
+version          "1.4.0"
 source_url       "https://github.com/hopshadoop/hive-chef"
 
 
@@ -33,8 +33,8 @@ attribute "hive2/user",
           :description => "User to install/run as",
           :type => 'string'
 
-attribute "hive2/group",
-          :description => "User to install/run as",
+attribute "hive2/user-home",
+          :description => "Home directory of hive user",
           :type => 'string'
 
 attribute "hive2/dir",

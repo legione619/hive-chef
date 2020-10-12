@@ -4,8 +4,8 @@ include_attribute "hops"
 include_attribute "kzookeeper"
 
 default['hive2']['user']                    = node['install']['user'].empty? ? "hive" : node['install']['user']
-default['hive2']['group']                   = node['install']['user'].empty? ? node['hops']['group'] : node['install']['user']
-default['hive2']['version']                 = "3.0.0.4"
+default['hive2']['user-home']               = "/home/#{node['hive2']['user']}"
+default['hive2']['version']                 = "3.0.0.5"
 default['hive2']['url']                     = "#{node['download_url']}/apache-hive-#{node['hive2']['version']}-bin.tar.gz"
 default['hive2']['port']                    = "9084"
 default['hive2']['portssl']                 = "9085"
@@ -34,8 +34,7 @@ default['hive2']['systemd']                              = "true"
 default['hive2']['hopsworks']['port']         = "8080"
 
 default['tez']['user']                    =  node['install']['user'].empty? ? "tez" : node['install']['user']
-default['tez']['group']                   =  node['hops']['group']
-default['tez']['version']                 = "0.9.1.2"
+default['tez']['version']                 = "0.9.1.3"
 default['tez']['url']                     = "#{node['download_url']}/apache-tez-#{node['tez']['version']}.tar.gz"
 default['tez']['dir']                     =  node['install']['dir'].empty? ? "/srv" : node['install']['dir']
 default['tez']['home']                    =  node['tez']['dir'] + "/apache-tez-" + node['tez']['version']
@@ -44,7 +43,6 @@ default['tez']['hopsfs_dir']              = "#{node['hops']['hdfs']['apps_dir']}
 default['tez']['conf_dir']                =  node['tez']['base_dir'] + "/conf"
 
 default['slider']['user']                    =  node['install']['user'].empty? ? "slider" : node['install']['user']
-default['slider']['group']                   =  node['hops']['group']
 default['slider']['version']                 = "0.93.1-incubating-SNAPSHOT"
 default['slider']['url']                     = "#{node['download_url']}/slider-#{node['slider']['version']}-all.tar.gz"
 default['slider']['dir']                     =  node['install']['dir'].empty? ? "/srv" : node['install']['dir']
@@ -59,7 +57,7 @@ default['tez']['session_per_queue']     = 100
 
 default['hive2']['conf']['mapreduce_input_size']     = "134217728"
 
-default['hive2']['hudi_version']              = "0.5.1-SNAPSHOT"
+default['hive2']['hudi_version']              = "0.5.1.1-SNAPSHOT"
 default['hive2']['hudi_hadoop_mr_bundle_url']     = "#{node['download_url']}/hudi/#{node['hive2']['hudi_version']}/hudi-hadoop-mr-bundle-#{node['hive2']['hudi_version']}.jar"
 
 default['hive2']['jmx']['prometheus_exporter']['version']  = "0.12.0"

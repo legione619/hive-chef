@@ -1,10 +1,18 @@
 include_recipe "hive2::_configure"
 
+crypto_dir = x509_helper.get_crypto_dir(node['hive2']['user'])
+kagent_hopsify "Generate x.509" do
+  user node['hive2']['user']
+  crypto_directory crypto_dir
+  action :generate_x509
+  not_if { node["kagent"]["enabled"] == "false" }
+end
+
 # Template HiveServer2 for the JMX prometheus exporter
 cookbook_file "#{node['hive2']['conf_dir']}/hiveserver2.yaml" do
   source 'hiveserver2.yaml'
   owner node['hive2']['user']  
-  group node['hive2']['group'] 
+  group node['hops']['group'] 
   mode '0755'
   action :create
 end
@@ -14,8 +22,10 @@ if exists_local("ndb", "mysqld")
   deps = "mysqld.service "
 end  
 if exists_local("hive2", "metastore") || exists_local("hive2", "default")
-  deps += "hivemetastore.service"
+  deps += "hivemetastore.service "
 end
+deps += "consul.service "
+
 service_name="hiveserver2"
 
 case node['platform_family']
