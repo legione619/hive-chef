@@ -5,7 +5,7 @@ include_attribute "kzookeeper"
 
 default['hive2']['user']                    = node['install']['user'].empty? ? "hive" : node['install']['user']
 default['hive2']['user-home']               = "/home/#{node['hive2']['user']}"
-default['hive2']['version']                 = "3.0.0.5"
+default['hive2']['version']                 = "3.0.0.6"
 default['hive2']['url']                     = "#{node['download_url']}/apache-hive-#{node['hive2']['version']}-bin.tar.gz"
 default['hive2']['port']                    = "9084"
 default['hive2']['portssl']                 = "9085"
@@ -22,9 +22,9 @@ default['hive2']['scratch_dir']             = "/tmp/hive"
 
 default['hive2']['mysql_user']              = "hive"
 default['hive2']['mysql_password']          = "hive"
-default['hive2']['mysql_connector_version'] = "5.1.29"
+default['hive2']['mysql_connector_version'] = "8.0.21"
 default['hive2']['mysql_connector_url']     = "#{node['download_url']}/mysql-connector-java-#{node['hive2']['mysql_connector_version']}-bin.jar"
-default['hive2']['mysql_connector_checksum'] = "32ddcf6d2613c79595f4f3fda01efb8620ea2bf50df954215c175ebec4cc67b9"
+default['hive2']['mysql_connector_checksum'] = "2f62d886270a75ebc8e8fd89127d4a30ccc711f02256ade2cfb7090817132003"
 
 
 default['hive2']['metastore']['port']                    = "9083"
@@ -57,7 +57,7 @@ default['tez']['session_per_queue']     = 100
 
 default['hive2']['conf']['mapreduce_input_size']     = "134217728"
 
-default['hive2']['hudi_version']              = "0.5.1.1-SNAPSHOT"
+default['hive2']['hudi_version']              = "0.6.1-SNAPSHOT"
 default['hive2']['hudi_hadoop_mr_bundle_url']     = "#{node['download_url']}/hudi/#{node['hive2']['hudi_version']}/hudi-hadoop-mr-bundle-#{node['hive2']['hudi_version']}.jar"
 
 default['hive2']['jmx']['prometheus_exporter']['version']  = "0.12.0"

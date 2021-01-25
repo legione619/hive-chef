@@ -926,7 +926,7 @@
   </property>
   <property>
     <name>javax.jdo.option.ConnectionDriverName</name>
-    <value>com.mysql.jdbc.Driver</value>
+    <value>com.mysql.cj.jdbc.Driver</value>
     <description>Driver class name for a JDBC metastore</description>
   </property>
   <property>
@@ -1137,7 +1137,7 @@
   </property>
   <property>
     <name>hive.aux.jars.path</name>
-    <value><%= node['hive2']['base_dir'] %>/lib/hudi-hadoop-mr-bundle-<%= node['hive2']['hudi_version'] %>.jar</value>
+    <value><%= node['hive2']['hopsworks_jars'] %>/hudi-hadoop-mr-bundle-<%= node['hive2']['hudi_version'] %>.jar</value>
     <description>The location of the plugin jars that contain implementations of user defined functions and serdes.</description>
   </property>
   <property>
