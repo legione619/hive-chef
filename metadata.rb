@@ -4,7 +4,7 @@ maintainer_email "jdowling@kth.se"
 license          "Apache v2"
 description      'Installs/Configures Hive Server'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "2.0.0"
+version          "2.1.0"
 source_url       "https://github.com/hopshadoop/hive-chef"
 
 
@@ -26,7 +26,6 @@ recipe           "default", "Starts both a Hive metastore and server2 and tez"
 recipe           "metastore", "Starts  a Hive Metastore Server"
 recipe           "server2", "Starts  a Hive Server2"
 recipe           "tez", "Install Tez"
-recipe           "llap", "Deploy LLAP daemons"
 recipe           "purge", "Removes and deletes an installed Hive Server"
 
 attribute "hive2/user",
@@ -103,10 +102,6 @@ attribute "install/user",
 
 attribute "tez/user",
           :description => "User to install/run tez as",
-          :type => 'string'
-
-attribute "slider/user",
-          :description => "User to install/run slider as",
           :type => 'string'
 
 attribute "hive2/hudi_hadoop_mr_bundle_url",
