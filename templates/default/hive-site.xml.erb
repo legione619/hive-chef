@@ -372,8 +372,18 @@
     <description>location of default database for the warehouse</description>
   </property>
   <property>
+    <name>metastore.warehouse.enforce.authority</name>
+    <value><%= node['hive2']['metastore']['enforce_authority'] %></value>
+    <description>Enforce warehouse authority to be the same as the one specified in the metastore.warehouse.dir option</description>
+  </property>
+  <property>
+    <name>hive.warehouse.subdir.inherit.perms</name>
+    <value>true</value>
+    <description>Set this to false if the table directories should be created with the permissions derived from dfs umask instead of inheriting the permission of the warehouse or database directory.</description>
+  </property>
+  <property>
     <name>hive.metastore.uris</name>
-    <value>thrift://<%= @metastore_ip %>:<%= node['hive2']['metastore']['port'] %></value>
+    <value>thrift://<%= @metastore_fqdn %>:<%= node['hive2']['metastore']['port'] %></value>
     <description>Thrift URI for the remote metastore. Used by metastore client to connect to remote metastore.</description>
   </property>
   <property>
@@ -916,7 +926,7 @@
   </property>
   <property>
     <name>javax.jdo.option.ConnectionDriverName</name>
-    <value>com.mysql.jdbc.Driver</value>
+    <value>com.mysql.cj.jdbc.Driver</value>
     <description>Driver class name for a JDBC metastore</description>
   </property>
   <property>
@@ -1127,7 +1137,7 @@
   </property>
   <property>
     <name>hive.aux.jars.path</name>
-    <value><%= node['hive2']['base_dir'] %>/lib/hudi-hadoop-mr-bundle-<%= node['hive2']['hudi_version'] %>.jar</value>
+    <value><%= node['hive2']['hopsworks_jars'] %>/hudi-hadoop-mr-bundle-<%= node['hive2']['hudi_version'] %>.jar</value>
     <description>The location of the plugin jars that contain implementations of user defined functions and serdes.</description>
   </property>
   <property>
@@ -2579,7 +2589,7 @@
   </property>
   <property>
     <name>hive.zookeeper.quorum</name>
-    <value><%= @zk_endpoints %></value>
+    <value><%= @zk_fqdn %></value>
     <description>
       List of ZooKeeper servers to talk to. This is needed for:
       1. Read/write locks - when hive.lock.manager is set to
@@ -4184,7 +4194,7 @@
   </property>
   <property>
     <name>hive.execution.mode</name>
-    <value><%= node['hive2']['execution_mode'] %></value>
+    <value>container</value>
     <description>
       Expects one of [container, llap].
       Chooses whether query fragments will run in container or in llap
@@ -4787,7 +4797,7 @@
   </property>
   <property>
     <name>hive.llap.execution.mode</name>
-    <value><%= node['llap']['execution_mode'] %></value>
+    <value>none</value>
     <description>
       Expects one of [auto, none, all, map, only].
       Chooses whether query fragments will run in container or in llap
@@ -4995,7 +5005,7 @@
   </property>
   <property>
     <name>hive.llap.daemon.service.hosts</name>
-    <value>@<%= node['llap']['cluster_name'] %></value>
+    <value/>
     <description>
       Explicitly specified hosts to use for LLAP scheduling. Useful for testing. By default,
       YARN registry is used.
@@ -5368,5 +5378,9 @@
   <property>
     <name>hive.superuser</name>
     <value><%= node['hive2']['user'] %></value>
+  </property>
+  <property>
+    <name>hive.superuser.impersonation-users</name>
+    <value><%= node['hive2']['user'] %>,<%= node['hopsworks']['user'] %></value>
   </property>
 </configuration>

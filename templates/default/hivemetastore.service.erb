@@ -1,12 +1,20 @@
 [Unit]
 Description = Hive metaserver
 After = syslog.target network.target remote-fs.target <%= @deps %>
+#hive metastore take ~11s to fail if the namenode is not up
+#restartSec is 2 so the service restart ever 13s
+#a maximum burst of 47 in 11min guaranty that it will at least try for 10min (47*13=611~10,2min)
+StartLimitIntervalSec=660
+StartLimitBurst=47
 
 [Service]
 User = <%= node['hive2']['user'] %>
 
 ExecStart = <%= node['hive2']['base_dir'] %>/bin/hive --service metastore
 LimitNOFILE = 20000
+TimeoutSec= 10min
+Restart=on-failure
+RestartSec=2
 
 Type = simple
 

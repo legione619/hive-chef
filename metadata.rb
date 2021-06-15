@@ -4,33 +4,36 @@ maintainer_email "jdowling@kth.se"
 license          "Apache v2"
 description      'Installs/Configures Hive Server'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "1.2.0"
+version          "2.2.0"
 source_url       "https://github.com/hopshadoop/hive-chef"
 
 
-
-depends          "ndb"
-depends          "hops"
-depends          "kagent"
-depends          "conda"
-depends          "java"
-depends          "kzookeeper"
-depends          "magic_shell"
+depends 'java', '~> 7.0.0'
+depends 'magic_shell', '~> 1.0.0'
+depends 'compat_resource', '~> 12.19.0'
+depends 'authbind', '~> 0.1.10'
+depends 'ntp', '~> 2.0.0'
+depends 'kagent'
+depends 'hops'
+depends 'ndb'
+depends 'conda'
+depends 'kzookeeper'
+depends 'consul'
+depends 'ulimit'
 
 recipe           "install", "Installs a Hive2 Server"
 recipe           "default", "Starts both a Hive metastore and server2 and tez"
 recipe           "metastore", "Starts  a Hive Metastore Server"
 recipe           "server2", "Starts  a Hive Server2"
 recipe           "tez", "Install Tez"
-recipe           "llap", "Deploy LLAP daemons"
 recipe           "purge", "Removes and deletes an installed Hive Server"
 
 attribute "hive2/user",
           :description => "User to install/run as",
           :type => 'string'
 
-attribute "hive2/group",
-          :description => "User to install/run as",
+attribute "hive2/user-home",
+          :description => "Home directory of hive user",
           :type => 'string'
 
 attribute "hive2/dir",
@@ -77,6 +80,10 @@ attribute "hive2/metastore/port",
           :description => "metastore port",
           :type => "string"
 
+attribute "hive2/metastore/enforce_authority",
+          :description => "Enforce warehouse authority to be the same as the one specified in the metastore.warehouse.dir option (default true)",
+          :type => "string"
+
 attribute "hive2/scratch_dir",
           :description => "Hive Tez Scratch dir location",
           :type => "string"
@@ -95,10 +102,6 @@ attribute "install/user",
 
 attribute "tez/user",
           :description => "User to install/run tez as",
-          :type => 'string'
-
-attribute "slider/user",
-          :description => "User to install/run slider as",
           :type => 'string'
 
 attribute "hive2/hudi_hadoop_mr_bundle_url",

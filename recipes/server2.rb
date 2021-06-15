@@ -1,10 +1,18 @@
 include_recipe "hive2::_configure"
 
+crypto_dir = x509_helper.get_crypto_dir(node['hive2']['user'])
+kagent_hopsify "Generate x.509" do
+  user node['hive2']['user']
+  crypto_directory crypto_dir
+  action :generate_x509
+  not_if { node["kagent"]["enabled"] == "false" }
+end
+
 # Template HiveServer2 for the JMX prometheus exporter
 cookbook_file "#{node['hive2']['conf_dir']}/hiveserver2.yaml" do
   source 'hiveserver2.yaml'
   owner node['hive2']['user']  
-  group node['hive2']['group'] 
+  group node['hops']['group'] 
   mode '0755'
   action :create
 end
@@ -14,8 +22,10 @@ if exists_local("ndb", "mysqld")
   deps = "mysqld.service "
 end  
 if exists_local("hive2", "metastore") || exists_local("hive2", "default")
-  deps += "hivemetastore.service"
+  deps += "hivemetastore.service "
 end
+deps += "consul.service "
+
 service_name="hiveserver2"
 
 case node['platform_family']
@@ -31,13 +41,16 @@ service service_name do
   action :nothing
 end
 
+hive_metastore_fqdn = consul_helper.get_service_fqdn("metastore.hive")
+
 template systemd_script do
   source "#{service_name}.service.erb"
   owner "root"
   group "root"
   mode 0754
   variables({
-            :deps => deps
+              :deps => deps,
+              :hive_metastore_endpoint => hive_metastore_fqdn
            })
   if node['services']['enabled'] == "true"
     notifies :enable, resources(:service => service_name)
@@ -60,3 +73,19 @@ if conda_helpers.is_upgrade
     action :systemd_reload
   end
 end  
+
+# Register Hive Server with Consul
+template "#{node['hive2']['consul']}/hiveserver2-health.sh" do
+  source "consul/hive-service-health.sh.erb"
+  owner node['hive2']['user']
+  group node['hops']['group']
+  variables({
+    :port => node['hive2']['hs2']['metrics_port']
+  })
+  mode 0750
+end
+
+consul_service "Registering Hive Server2 with Consul" do
+  service_definition "consul/hiveserver2-consul.hcl.erb"
+  action :register
+end

@@ -1,0 +1,30 @@
+services = [
+    {
+        id = "hive/metastore"
+        name = "hive"
+        tags = [
+            "metastore"
+        ]
+        port = <%= node['hive2']['metastore']['port'] %>
+        check = {
+            id = "hm-health-check"
+            name = "Health check for Hive metastore"
+            args = ["<%= node['hive2']['consul'] %>/metastore-health.sh"]
+            interval = "20s"
+            timeout = "20s"
+            status = "passing"
+        }
+    },
+    {
+        id = "hive/metastore/monitoring"
+        name = "hive"
+        tags = [
+            "monitoring"
+        ]
+        port = <%= node['hive2']['hm']['metrics_port'] %>
+        check = {
+            id = "hm-mon-health-check"
+            alias_service = "hive/metastore"
+        }
+    }
+]
