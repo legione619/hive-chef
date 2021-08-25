@@ -4,11 +4,10 @@ maintainer_email "jdowling@kth.se"
 license          "Apache v2"
 description      'Installs/Configures Hive Server'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "2.2.0"
+version          "2.3.0"
 source_url       "https://github.com/hopshadoop/hive-chef"
 
 
-depends 'java', '~> 7.0.0'
 depends 'magic_shell', '~> 1.0.0'
 depends 'compat_resource', '~> 12.19.0'
 depends 'authbind', '~> 0.1.10'
@@ -20,6 +19,8 @@ depends 'conda'
 depends 'kzookeeper'
 depends 'consul'
 depends 'ulimit'
+depends 'java'
+
 
 recipe           "install", "Installs a Hive2 Server"
 recipe           "default", "Starts both a Hive metastore and server2 and tez"
