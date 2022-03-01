@@ -1,7 +1,5 @@
 include_recipe "java"
 
-my_ip = my_private_ip()
-
 group node['hops']['group'] do
   gid node['hops']['group_id']
   action :create
@@ -10,6 +8,8 @@ group node['hops']['group'] do
 end
 
 user node['hive2']['user'] do
+  uid node['hive2']['user_id']
+  gid node['hops']['group']
   home node['hive2']['user-home']
   action :create
   shell "/bin/bash"
@@ -19,19 +19,32 @@ user node['hive2']['user'] do
   not_if { node['install']['external_users'].casecmp("true") == 0 }
 end
 
-group node['hops']['group'] do
-  action :modify
-  members node['hive2']['user']
-  append true
-  not_if { node['install']['external_users'].casecmp("true") == 0 }
-end
-
 group node["kagent"]["certs_group"] do
   action :manage
   append true
   excluded_members node['hive2']['user']
   not_if { node['install']['external_users'].casecmp("true") == 0 }
   only_if { conda_helpers.is_upgrade }
+end
+
+directory node['data']['dir'] do
+  owner 'root'
+  group 'root'
+  mode '0775'
+  action :create
+  not_if { ::File.directory?(node['data']['dir']) }
+end
+
+directory node['hive2']['data_volume']['root_dir'] do
+  owner node['hive2']['user']
+  group node['hops']['group']
+  mode '0775'
+end
+
+directory node['hive2']['data_volume']['logs_dir'] do
+  owner node['hive2']['user']
+  group node['hops']['group']
+  mode '0775'
 end
 
 package_url = "#{node['hive2']['url']}"

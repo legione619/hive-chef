@@ -4,8 +4,9 @@ include_attribute "hops"
 include_attribute "kzookeeper"
 
 default['hive2']['user']                    = node['install']['user'].empty? ? "hive" : node['install']['user']
+default['hive2']['user_id']                 = '1516'
 default['hive2']['user-home']               = "/home/#{node['hive2']['user']}"
-default['hive2']['version']                 = "3.0.0.8"
+default['hive2']['version']                 = "3.0.0.11"
 default['hive2']['url']                     = "#{node['download_url']}/apache-hive-#{node['hive2']['version']}-bin.tar.gz"
 default['hive2']['port']                    = "9084"
 default['hive2']['portssl']                 = "9085"
@@ -19,6 +20,10 @@ default['hive2']['hopsworks_jars']          = node['hive2']['base_dir'] + "/hops
 default['hive2']['consul']                  = node['hive2']['base_dir'] + "/consul"
 default['hive2']['hopsfs_dir']              = "#{node['hops']['hdfs']['apps_dir']}/hive"
 default['hive2']['scratch_dir']             = "/tmp/hive"
+
+# Data volume directories
+default['hive2']['data_volume']['root_dir'] = "#{node['data']['dir']}/apache-hive"
+default['hive2']['data_volume']['logs_dir'] = "#{node['hive2']['data_volume']['root_dir']}/logs"
 
 default['hive2']['mysql_user']              = "hive"
 default['hive2']['mysql_password']          = "hive"
@@ -34,7 +39,8 @@ default['hive2']['systemd']                              = "true"
 default['hive2']['hopsworks']['port']         = "8080"
 
 default['tez']['user']                    =  node['install']['user'].empty? ? "tez" : node['install']['user']
-default['tez']['version']                 = "0.9.1.3"
+default['tez']['user_id']                 = '1517'
+default['tez']['version']                 = "0.9.1.4"
 default['tez']['url']                     = "#{node['download_url']}/apache-tez-#{node['tez']['version']}.tar.gz"
 default['tez']['dir']                     =  node['install']['dir'].empty? ? "/srv" : node['install']['dir']
 default['tez']['home']                    =  node['tez']['dir'] + "/apache-tez-" + node['tez']['version']
